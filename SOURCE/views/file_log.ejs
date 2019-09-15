@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>CCTV MANAGER</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel='stylesheet' href='/stylesheets/total.style.css' />
+</head>
+<body>
+  <nav class="navbar is-link">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+          CCTV MANAGER
+      </a>
+      <div class="navbar-burger burger" data-target="navMenuColorlink-example">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="field is-grouped">
+            <p class="control">
+              <span>'<%= session.USER_NAME %>'님</span>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/info/show/">
+                <span class="icon">
+                  <i class="fa fa-pencil"></i>
+                </span>
+                <span>
+                  내 정보
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/api/auth/signout/">
+                <span class="icon">
+                  <i class="fa fa-sign-out"></i>
+                </span>
+                <span>로그아웃</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <div class="sidebar">
+      <aside class="menu">
+        <p class="menu-label">
+          CCTV 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/cctv/monitor/" <% if (pageType == 0) { %>class="is-active"<% }%>>CCTV 모니터링</a></li>
+          <li><a href="/cctv/edit/" <% if (pageType == 1) { %>class="is-active"<% }%>>CCTV 공간관리</a></li>
+          <% if (session.USER_POSITION == 0) { %>
+            <li><a href="/cctv/add/" <% if (pageType == 2) { %>class="is-active"<% }%>>CCTV 관리</a></li>
+          <% } %>
+        </ul>
+        <p class="menu-label">
+          파일 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/file/movie/" <% if (pageType == 3) { %>class="is-active"<% }%>>영상파일 관리</a></li>
+          <li><a href="/file/log/" <% if (pageType == 4) { %>class="is-active"<% }%>>로그파일 관리</a></li>
+        </ul>
+        <% if (session.USER_POSITION == 0) { %>
+          <p class="menu-label">
+            유저 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/user/manage/" <% if (pageType == 5) { %>class="is-active"<% }%>>일반관리자 관리</a></li>
+          </ul>
+          <p class="menu-label">
+            공간 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/takeSpace/manage/" <% if (pageType == 9) { %>class="is-active"<% }%>>촬영공간 관리</a></li>
+            <li><a href="/path/manage/" <% if (pageType == 10) { %>class="is-active"<% }%>>경로 관리</a></li>
+            <li><a href="/neighbor/manage/" <% if (pageType == 6) { %>class="is-active"<% }%>>이웃공간 관리</a></li>
+            <li><a href="/sequence/manage/" <% if (pageType == 7) { %>class="is-active"<% }%>>시퀀스 관리</a></li>
+          </ul>
+        <% } %>
+      </aside>
+    </div>
+
+
+    <div class="main-content content-full">
+      <div class="content">
+        <h3>◎ 로그파일 관리 <button class="button is-small is-info is-optional-button" id="searchBtn" onclick="openSearchBox()">검색란 열기</button> <button class="button is-small is-info is-optional-button" onclick="openTargetModalBox('deleteBeforeDate')">날짜기준삭제</button> <button class="button is-small is-info is-optional-button" onclick="allStatisticsDownload()">전체통계 다운로드</button> <button class="button is-small is-info is-optional-button" onclick="openTargetModalBox('fileUploadModal')">파일 업로드</button></h3>
+      </div>
+      <div class="content is-size-7" id="searchBox">
+        <div class="search-box">
+
+          <div class="search-field">
+            <div class="search-label">
+              로그파일
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="로그파일이름" name="nameCond">
+                </div>
+              </div>
+            </div>
+          </div><div class="search-field">
+            <div class="search-label">
+              영상파일
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="영상파일이름" name="movieCond">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              CCTV
+            </div>
+            <div class="search-line">
+              <button class="button is-small is-fullwidth" id="cctvSelectBtn" onclick="openTargetModalBox('cctvModal')">CCTV 선택</button>
+              <input type="hidden" id="cctvSelectVal" name="cctvCond"/>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              촬영공간주소
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="촬영공간주소" name="tpAddressCond">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              촬영공간건물
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="촬영공간건물" name="tpBuildingCond">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              촬영공간층수
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="촬영공간층수" name="tpFloorCond">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              촬영공간위치
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="촬영공간위치" name="tpSiteCond">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              시퀀스
+            </div>
+            <div class="search-line">
+              <button class="button is-small is-fullwidth" id="sqSelectBtn" onclick="openTargetModalBox('sqModal')">시퀀스 선택</button>
+              <input type="hidden" id="sqSelectVal" name="seqCond"/>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              시간대
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control is-small">
+                  <input class="input is-small" type="datetime-local" name="startTimeCond">
+                </div>
+              </div>
+              <p style="margin: 0px 10px; height: 24px;"> ~ </p>
+              <div class="field">
+                <div class="control is-small">
+                  <input class="input is-small" type="datetime-local" name="endTimeCond">
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="button is-primary is-fullwidth is-small" onclick="searchLFile()">검색</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <table class="table is-bordered is-narrow is-fullwidth change-list is-size-7">
+          <thead>
+            <tr>
+              <th rowspan="2">영상파일</th>
+              <th rowspan="2">로그파일</th>
+              <th>시작시간</th>
+              <th>끝시간</th>
+              <th>촬영공간</th>
+              <th>다운로드</th>
+              <th rowspan="2">통계</th>
+            </tr>
+            <tr>
+              <th>확장자</th>
+              <th>CCTV</th>
+              <th>시퀀스</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable" class="is-size-7">
+            <% for (var i = 0; i < data.logList.length; i++) {%>
+            <tr>
+              <td rowspan="2" width="25%"><%= data.logList[i].v_MOVIE_FILE_NAME %></td>
+              <td rowspan="2" width="25%"><%= data.logList[i].v_LOG_FILE_NAME %></td>
+              <td width="10%"><%= data.logList[i].dt_START_TIME.toISOString().slice(0,10) %></td>
+              <td width="10%"><%= data.logList[i].dt_END_TIME.toISOString().slice(0,10) %></td>
+              <td width="25%"><%= data.logList[i].v_ADDRESS %> <%= data.logList[i].v_BUILDING %> <%= data.logList[i].v_FLOOR %> <%= data.logList[i].v_SITE %></td>
+              <td width="5%"><a class="button is-small" href="/upload/<%= data.logList[i].v_ADDRESS.split(' ').join('') %><%= data.logList[i].v_BUILDING.split(' ').join('') %><%= data.logList[i].v_FLOOR.split(' ').join('') %><%= data.logList[i].v_SITE.split(' ').join('') %>/<%= data.logList[i].v_LOG_FILE_NAME %>">다운로드</a></td>
+              <td rowspan="2" width="5%"><button class="button is-small" onclick="showStatisticsModal('<%= data.logList[i].v_LOG_FILE_NAME %>')">통계보기</button></td>
+            </tr>
+            <tr>
+              <td><%= data.logList[i].v_EXTENSION %></td>
+              <td><%= data.logList[i].v_MODEL %></td>
+              <td><%= data.logList[i].SEQS %></td>
+              <td><button class="button is-small is-size-7" onclick="deleteLF('<%= data.logList[i].v_LOG_FILE_NAME %>')">삭제</button></td>
+            </tr>
+            <%}%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal" id="cctvModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">검색 : CCTV 선택</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('cctvModal')"></button>
+      </header>
+      <section class="modal-card-body">
+        <% for (var i = 0; i < data.cctvList.length; i++) { %>
+        <button class="button is-small select-button" onclick="selectBtn(this)" id="cctvBtn<%= data.cctvList[i].n_CCTV_ID %>">CCTV[<%= data.cctvList[i].v_MODEL %>][<%= data.cctvList[i].n_CCTV_ID %>]</button>
+        <% } %>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="saveOptions('cctv')">완료</button>
+      </footer>
+    </div>
+  </div>
+
+
+  <div class="modal" id="tpModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">검색 : 촬영공간 선택</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('tpModal')"></button>
+      </header>
+      <section class="modal-card-body">
+        <% for (var i = 0; i < data.tpList.length; i++) { %>
+        <button class="button is-small select-button" onclick="selectBtn(this)" id="tpBtn<%= data.tpList[i].n_TAKE_SPACE_ID %>"><%= data.tpList[i].v_ADDRESS %> <%= data.tpList[i].v_BUILDING %> <%= data.tpList[i].v_FLOOR %> <%= data.tpList[i].v_SITE %></button>
+        <% } %>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="saveOptions('tp')">완료</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal" id="sqModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">검색 : 시퀀스 선택</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('sqModal')"></button>
+      </header>
+      <section class="modal-card-body">
+        <% for (var i = 0; i < data.seqList.length; i++) { %>
+        <button class="button is-small select-button" onclick="selectBtn(this)" id="sqBtn<%= data.seqList[i].n_SEQ_ID %>"><%= data.seqList[i].v_SEQ_NAME %></button>
+        <% } %>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="saveOptions('sq')">완료</button>
+      </footer>
+    </div>
+  </div>
+
+
+  <div class="modal" id="fileUploadModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <div class="modal-upwall">업로드중...</div>
+      <header class="modal-card-head">
+        <p class="modal-card-title">로그파일 업로드</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('fileUploadModal')"></button>
+      </header>
+      <form class="modal-card-body" enctype="multipart/form-data" id="uploadForm" action="/api/file/log/upload" method="post">
+        <div class="field">
+          <label class="label is-small">영상파일</label>
+          <div class="control">
+            <div class="select is-small is-fullwidth">
+              <select name="movieSelect" id="movieSelectBox">
+                <option value="-1">영상파일을 선택해주세요.</option>
+                <% for (var i = 0; i < data.movieList.length; i++) {%>
+                  <option value="<%= data.movieList[i].v_MOVIE_FILE_NAME %>"><%= data.movieList[i].v_MOVIE_FILE_NAME %></option>
+                <%}%>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label is-small">파일</label>
+          <div class="file has-name is-small is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="uploadedFile" id="fileInput" onchange="insertFileName()">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fa fa-upload"></i>
+                </span>
+                <span class="file-label">
+                  파일선택
+                </span>
+              </span>
+              <span class="file-name" id="fileNameLabel">
+
+              </span>
+            </label>
+          </div>
+        </div>
+
+      </form>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="uploadLogFile()">완료</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal" id="statisticsModal">
+    <div class="modal-background"></div>
+    <div class="modal-card" style="width: 80%; min-height: 80%;">
+      <header class="modal-card-head">
+        <p class="modal-card-title is-size-6" name="statisticsName">통계</p>
+        <button class="delete" aria-label="close" onclick="hideStatisticsModal()"></button>
+      </header>
+      <section class="modal-card-body">
+        <h3>◎ 통계 정보</h3>
+        <table class="table is-bordered is-narrow is-fullwidth change-list is-size-7">
+          <thead>
+            <tr>
+              <th>레코드수</th>
+              <th>촬영시간</th>
+              <th>객체수</th>
+              <th>평균위치</th>
+              <th>평균속도</th>
+              <th>평균크기</th>
+              <th>평균색상</th>
+            </tr>
+          </thead>
+          <tbody id="statisticsTable" class="is-size-7">
+
+          </tbody>
+        </table>
+
+        <br>
+
+
+        <div id="chartBox" style="width:100%;">
+          <div style="width:100%; height: 200px;">
+            <canvas id="objectTotalChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+
+  <div class="modal" id="deleteBeforeDate">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">날짜 기준 삭제</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('deleteBeforeDate')"></button>
+      </header>
+      <div class="modal-card-body">
+        <div class="field">
+          <label class="label is-small">기준시간</label>
+          <div class="control">
+            <input class="input is-small" type="datetime-local" name="targetDate" />
+          </div>
+        </div>
+      </div>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="deleteLFBeforeDate()">삭제</button>
+      </footer>
+    </div>
+  </div>
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js" integrity="sha256-c0m8xzX5oOBawsnLVpHnU2ieISOvxi584aNElFl2W6M=" crossorigin="anonymous"></script>
+<script src="/javascripts/myScripts.js"></script>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>CCTV MANAGER</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+  <link rel='stylesheet' href='/stylesheets/total.style.css' />
+</head>
+<body>
+  <nav class="navbar is-link">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+          CCTV MANAGER
+      </a>
+      <div class="navbar-burger burger" data-target="navMenuColorlink-example">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="field is-grouped">
+            <p class="control">
+              <span>'<%= session.USER_NAME %>'님</span>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/info/show/">
+                <span class="icon">
+                  <i class="fa fa-pencil"></i>
+                </span>
+                <span>
+                  내 정보
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/api/auth/signout/">
+                <span class="icon">
+                  <i class="fa fa-sign-out"></i>
+                </span>
+                <span>로그아웃</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <div class="sidebar">
+      <aside class="menu">
+        <p class="menu-label">
+          CCTV 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/cctv/monitor/" <% if (pageType == 0) { %>class="is-active"<% }%>>CCTV 모니터링</a></li>
+          <li><a href="/cctv/edit/" <% if (pageType == 1) { %>class="is-active"<% }%>>CCTV 공간관리</a></li>
+          <% if (session.USER_POSITION == 0) { %>
+            <li><a href="/cctv/add/" <% if (pageType == 2) { %>class="is-active"<% }%>>CCTV 관리</a></li>
+          <% } %>
+        </ul>
+        <p class="menu-label">
+          파일 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/file/movie/" <% if (pageType == 3) { %>class="is-active"<% }%>>영상파일 관리</a></li>
+          <li><a href="/file/log/" <% if (pageType == 4) { %>class="is-active"<% }%>>로그파일 관리</a></li>
+        </ul>
+        <% if (session.USER_POSITION == 0) { %>
+          <p class="menu-label">
+            유저 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/user/manage/" <% if (pageType == 5) { %>class="is-active"<% }%>>일반관리자 관리</a></li>
+          </ul>
+          <p class="menu-label">
+            공간 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/takeSpace/manage/" <% if (pageType == 9) { %>class="is-active"<% }%>>촬영공간 관리</a></li>
+            <li><a href="/path/manage/" <% if (pageType == 10) { %>class="is-active"<% }%>>경로 관리</a></li>
+            <li><a href="/neighbor/manage/" <% if (pageType == 6) { %>class="is-active"<% }%>>이웃공간 관리</a></li>
+            <li><a href="/sequence/manage/" <% if (pageType == 7) { %>class="is-active"<% }%>>시퀀스 관리</a></li>
+          </ul>
+        <% } %>
+      </aside>
+    </div>
+
+
+    <div class="main-content">
+      <% if (data.cctvList.length > 0) { %>
+      <div class="content">
+        <h3>◎ CCTV 공간관리 |
+          <span style="font-size:14px;">
+              <i class="fa fa-video-camera"></i> <% if (data.cctvList.length > 0) { %>CCTV[<%= data.targetCctv[0].v_MODEL %>][<%= data.targetCctv[0].n_CCTV_ID %>]<% } %></font></h3>
+      </div>
+      <div>
+        <input type="hidden" id="targetCctvInput" value="<%= JSON.stringify(data.targetCctv) %>" />
+        <input type="hidden" id="targetPlaceInput" value="<%=JSON.stringify(data.allTpList) %>"/>
+      </div>
+      <div class="content">
+        <div class="change-wrapper-side">
+          <p align="center">CCTV<% if (data.cctvList.length > 0) { %>[<%= data.targetCctv[0].v_MODEL %>][<%= data.targetCctv[0].n_CCTV_ID %>]의 촬영공간 리스트<% } %></p>
+
+          <input type="hidden" id="curCCTVId"/>
+
+          <nav class="panel color-white">
+            <div class="panel-block">
+              <div class="search-box full-width">
+                <div class="search-field">
+                  <div class="search-label">
+                    주소
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="주소" id="addrCond1">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="search-field">
+                  <div class="search-label">
+                    건물
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="건물" id="bCond1">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="search-field">
+                  <div class="search-label">
+                    층수
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="층수" id="fCond1">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="search-field">
+                  <div class="search-label">
+                    공간
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="위치" id="sCond1">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="button is-primary is-fullwidth" onclick="searchTP(0)">검색</button>
+              </div>
+            </div>
+            <div class="panel-block">
+              <table class="table is-striped is-narrow is-fullwidth change-list">
+                <thead>
+                  <tr>
+                    <th>주소</th>
+                    <th>건물</th>
+                    <th>층수</th>
+                    <th>위치</th>
+                    <th>삭제</th>
+                  </tr>
+                </thead>
+                <tbody id="TPTable0">
+                  <% for (var i = 0; i < data.tpList.length; i++) {%>
+                  <tr>
+                    <td name="address"><%= data.tpList[i].v_ADDRESS %></td>
+                    <td name="building"><%= data.tpList[i].v_BUILDING %></td>
+                    <td name="floor"><%= data.tpList[i].v_FLOOR %></td>
+                    <td name="site"><%= data.tpList[i].v_SITE %></td>
+                    <td><a onclick="deleteTP(<%= data.tpList[i].n_TAKE_SPACE_ID %>, <%= data.targetCctv[0].n_CCTV_ID %>)">삭제</a></td>
+                  </tr>
+                  <%}%>
+                </tbody>
+              </table>
+            </div>
+          </nav>
+
+
+        </div>
+        <div class="change-wrapper-side">
+          <p align="center">추가 가능한 촬영공간 리스트</p>
+          <nav class="panel color-white">
+            <div class="panel-block">
+              <div class="search-box full-width">
+                <div class="search-field">
+                  <div class="search-label">
+                    주소
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="주소" id="addrCond2">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="search-field">
+                  <div class="search-label">
+                    건물
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="건물" id="bCond2">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="search-field">
+                  <div class="search-label">
+                    층수
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="층수" id="fCond2">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="search-field">
+                  <div class="search-label">
+                    공간
+                  </div>
+                  <div class="search-line">
+                    <div class="field">
+                      <div class="control">
+                        <input class="input is-small" type="text" placeholder="위치" id="sCond2">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="button is-primary is-fullwidth" onclick="searchTP(1)">검색</button>
+              </div>
+            </div>
+            <div class="panel-block">
+              <table class="table is-striped is-narrow is-fullwidth change-list">
+                <thead>
+                  <tr>
+                    <th>주소</th>
+                    <th>건물</th>
+                    <th>층수</th>
+                    <th>위치</th>
+                    <th>추가</th>
+                  </tr>
+                </thead>
+                <tbody id="TPTable1">
+                  <% for (var i = 0; i < data.addableTpList.length; i++) {%>
+                  <tr>
+                    <td name="address"><%= data.addableTpList[i].v_ADDRESS %></td>
+                    <td name="building"><%= data.addableTpList[i].v_BUILDING %></td>
+                    <td name="floor"><%= data.addableTpList[i].v_FLOOR %></td>
+                    <td name="site"><%= data.addableTpList[i].v_SITE %></td>
+                    <td><a onclick="appendTP(<%= data.addableTpList[i].n_TAKE_SPACE_ID %>, <%= data.targetCctv[0].n_CCTV_ID %>)">추가</a></td>
+                  </tr>
+                  <%}%>
+                </tbody>
+              </table>
+            </div>
+          </nav>
+        </div>
+
+      </div>
+      <% } else { %>
+      <div class="content">
+        <h3>◎ CCTV 공간관리</h3>
+      </div>
+      <% }%>
+    </div>
+
+    <div class="sub-sidebar">
+      <nav class="panel">
+        <p class="panel-heading">
+          CCTV 리스트
+        </p>
+
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <input class="input is-small" type="text" placeholder="search" name="cctvSearchInput" onkeyup="makeCCTVList()">
+            <span class="icon is-small is-left">
+              <i class="fa fa-search"></i>
+            </span>
+          </p>
+        </div>
+        <% for (var i = 0; i < data.cctvList.length; i++) {%>
+        <a href="/cctv/edit/<%= data.cctvList[i].n_CCTV_ID %>" class="panel-block <% if (data.targetCctv[0].n_CCTV_ID == data.cctvList[i].n_CCTV_ID) {%>is-active<%}%>" style="font-size: 12px;">
+          <span class="panel-icon">
+            <i class="fa fa-video-camera"></i>
+          </span>
+          CCTV[<%= data.cctvList[i].v_MODEL %>][<%= data.cctvList[i].n_CCTV_ID %>]
+        </a>
+        <%}%>
+        <% if (data.cctvList.length == 0) {%>
+        <div class="panel-block">
+          할당된 CCTV가 없습니다.
+        </div>
+        <%}%>
+      </nav>
+    </div>
+  </div>
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/javascripts/myScripts.js"></script>
+</html>

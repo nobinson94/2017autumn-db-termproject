@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>CCTV MANAGER</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel='stylesheet' href='/stylesheets/total.style.css' />
+</head>
+<body>
+  <nav class="navbar is-link">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+          CCTV MANAGER
+      </a>
+      <div class="navbar-burger burger" data-target="navMenuColorlink-example">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="field is-grouped">
+            <p class="control">
+              <span>'<%= session.USER_NAME %>'님</span>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/info/show/">
+                <span class="icon">
+                  <i class="fa fa-pencil"></i>
+                </span>
+                <span>
+                  내 정보
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/api/auth/signout/">
+                <span class="icon">
+                  <i class="fa fa-sign-out"></i>
+                </span>
+                <span>로그아웃</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <div class="sidebar">
+      <aside class="menu">
+        <p class="menu-label">
+          CCTV 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/cctv/monitor/" <% if (pageType == 0) { %>class="is-active"<% }%>>CCTV 모니터링</a></li>
+          <li><a href="/cctv/edit/" <% if (pageType == 1) { %>class="is-active"<% }%>>CCTV 공간관리</a></li>
+          <% if (session.USER_POSITION == 0) { %>
+            <li><a href="/cctv/add/" <% if (pageType == 2) { %>class="is-active"<% }%>>CCTV 관리</a></li>
+          <% } %>
+        </ul>
+        <p class="menu-label">
+          파일 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/file/movie/" <% if (pageType == 3) { %>class="is-active"<% }%>>영상파일 관리</a></li>
+          <li><a href="/file/log/" <% if (pageType == 4) { %>class="is-active"<% }%>>로그파일 관리</a></li>
+        </ul>
+        <% if (session.USER_POSITION == 0) { %>
+          <p class="menu-label">
+            유저 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/user/manage/" <% if (pageType == 5) { %>class="is-active"<% }%>>일반관리자 관리</a></li>
+          </ul>
+          <p class="menu-label">
+            공간 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/takeSpace/manage/" <% if (pageType == 9) { %>class="is-active"<% }%>>촬영공간 관리</a></li>
+            <li><a href="/path/manage/" <% if (pageType == 10) { %>class="is-active"<% }%>>경로 관리</a></li>
+            <li><a href="/neighbor/manage/" <% if (pageType == 6) { %>class="is-active"<% }%>>이웃공간 관리</a></li>
+            <li><a href="/sequence/manage/" <% if (pageType == 7) { %>class="is-active"<% }%>>시퀀스 관리</a></li>
+          </ul>
+        <% } %>
+      </aside>
+    </div>
+
+    <div class="main-content content-full">
+      <div class="content">
+        <h3>◎ 촬영공간 관리  <button class="button is-small is-info is-optional-button" id="searchBtn" onclick="openSearchBox()">검색란 열기</button> <button class="button is-small is-info is-optional-button" onclick="openModalBoxWithMapType('take_space')">촬영공간 추가</button></h3>
+      </div>
+      <div class="content is-size-7" id="searchBox">
+        <div class="search-box">
+          <div class="search-field">
+            <div class="search-label">
+              주소
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="주소를 입력해주세요." name="address">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              건물
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="건물을 입력해주세요." name="building">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              층수
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="층수를 입력해주세요." name="floor">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              위치
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="위치를 입력해주세요." name="site">
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="button is-primary is-fullwidth is-small" onclick="searchTPListFromServer()">검색</button>
+        </div>
+      </div>
+
+
+      <!-- content -->
+      <div class="half-content">
+        <div id="tpMap">
+        </div>
+      </div>
+      <div class="half-content">
+        <table class="table is-bordered is-striped is-narrow is-fullwidth change-list is-size-7">
+          <thead>
+            <tr>
+              <th>주소</th>
+              <th>건물</th>
+              <th>층수</th>
+              <th>위치</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable">
+            <% if (data.tpList.length == 0) { %>
+              <tr>
+                <td colspan="5">촬영공간이 없습니다. 추가해주세요.</td>
+              </tr>
+            <% } %>
+            <% for (var i = 0; i < data.tpList.length; i++) {%>
+              <tr class="hover-pointer" onclick="markerCenter('tpMap', <%= data.tpList[i].f_LAT %>, <%= data.tpList[i].f_LNG %>, 'take_space', this)">
+                <td width="40%" name="address"><%= data.tpList[i].v_ADDRESS %></td>
+                <td width="30%" name="building"><%= data.tpList[i].v_BUILDING %></td>
+                <td width="10%" name="floor"><%= data.tpList[i].v_FLOOR %></td>
+                <td width="10%" name="site"><%= data.tpList[i].v_SITE %></td>
+                <td width="10%" onclick="delTP(<%= data.tpList[i].n_TAKE_SPACE_ID %>)"><a>삭제</a></td>
+              </tr>
+            <%}%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="modalBox">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">촬영공간 추가</p>
+        <button class="delete" aria-label="close" onclick="hideModalBox()"></button>
+      </header>
+      <section class="modal-card-body">
+        <div class="content">
+          <div class="search-box">
+            <div class="search-field">
+              <div class="search-label">
+                지도위치
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control" id="tpAddMap" style="min-height: 300px;">
+                  </div>
+                  <input type="hidden" name="tpLng" />
+                  <input type="hidden" name="tpLat" />
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                주소
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control">
+                    <input class="input is-small" type="text" name="tpAddress" placeholder="주소를 입력해주세요.">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                건물
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control">
+                    <input class="input is-small" type="text" name="tpBuilding" placeholder="건물을 입력해주세요.">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                층수
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control">
+                    <input class="input is-small" type="text" name="tpFloor" placeholder="층수를 입력해주세요.">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                위치
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control">
+                    <input class="input is-small" type="text" name="tpSite" placeholder="위치를 입력해주세요.">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+      <button type="submit" class="button is-primary is-fullwidth" onclick="addTp()">추가</button>
+      </footer>
+    </div>
+  </div>
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/javascripts/myScripts.js"></script>
+<script src="/javascripts/main.bundle.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmBwHX4GyyS7PxSu4jBwTLM2uelcCVdb8&callback=initTPMap"
+    async defer></script>
+
+</html>

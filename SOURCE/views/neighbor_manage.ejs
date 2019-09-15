@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>CCTV MANAGER</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel='stylesheet' href='/stylesheets/total.style.css' />
+</head>
+<body>
+  <nav class="navbar is-link">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+          CCTV MANAGER
+      </a>
+      <div class="navbar-burger burger" data-target="navMenuColorlink-example">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="field is-grouped">
+            <p class="control">
+              <span>'<%= session.USER_NAME %>'님</span>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/info/show/">
+                <span class="icon">
+                  <i class="fa fa-pencil"></i>
+                </span>
+                <span>
+                  내 정보
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/api/auth/signout/">
+                <span class="icon">
+                  <i class="fa fa-sign-out"></i>
+                </span>
+                <span>로그아웃</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <div class="sidebar">
+      <aside class="menu">
+        <p class="menu-label">
+          CCTV 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/cctv/monitor/" <% if (pageType == 0) { %>class="is-active"<% }%>>CCTV 모니터링</a></li>
+          <li><a href="/cctv/edit/" <% if (pageType == 1) { %>class="is-active"<% }%>>CCTV 공간관리</a></li>
+          <% if (session.USER_POSITION == 0) { %>
+            <li><a href="/cctv/add/" <% if (pageType == 2) { %>class="is-active"<% }%>>CCTV 관리</a></li>
+          <% } %>
+        </ul>
+        <p class="menu-label">
+          파일 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/file/movie/" <% if (pageType == 3) { %>class="is-active"<% }%>>영상파일 관리</a></li>
+          <li><a href="/file/log/" <% if (pageType == 4) { %>class="is-active"<% }%>>로그파일 관리</a></li>
+        </ul>
+        <% if (session.USER_POSITION == 0) { %>
+          <p class="menu-label">
+            유저 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/user/manage/" <% if (pageType == 5) { %>class="is-active"<% }%>>일반관리자 관리</a></li>
+          </ul>
+          <p class="menu-label">
+            공간 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/takeSpace/manage/" <% if (pageType == 9) { %>class="is-active"<% }%>>촬영공간 관리</a></li>
+            <li><a href="/path/manage/" <% if (pageType == 10) { %>class="is-active"<% }%>>경로 관리</a></li>
+            <li><a href="/neighbor/manage/" <% if (pageType == 6) { %>class="is-active"<% }%>>이웃공간 관리</a></li>
+            <li><a href="/sequence/manage/" <% if (pageType == 7) { %>class="is-active"<% }%>>시퀀스 관리</a></li>
+          </ul>
+        <% } %>
+      </aside>
+    </div>
+
+
+    <div class="main-content content-full">
+      <div class="content">
+        <h3>◎ 이웃공간 관리  <button class="button is-small is-info is-optional-button" id="searchBtn" onclick="openSearchBox()">검색란 열기</button> <button class="button is-small is-info is-optional-button" onclick="openModalBoxWithMapType('neighbor_space')">이웃공간 추가</button></h3>
+      </div>
+
+      <div class="content" id="searchBox">
+        <div class="search-box">
+          <div class="search-field">
+            <div class="search-label">
+              이름
+            </div>
+            <div class="search-line">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" placeholder="파일이름" id="npNameVal">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              촬영공간1
+            </div>
+            <div class="search-line">
+              <button class="button is-small is-fullwidth" id="tp1SelectBtn" onclick="openTargetModalBox('tp1Modal')">촬영공간1 선택</button>
+              <input type="hidden" id="tp1SelectVal" />
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              촬영공간2
+            </div>
+            <div class="search-line">
+              <button class="button is-small is-fullwidth" id="tp2SelectBtn" onclick="openTargetModalBox('tp2Modal')">촬영공간2 선택</button>
+              <input type="hidden" id="tp2SelectVal" />
+            </div>
+          </div>
+          <div class="search-field">
+            <div class="search-label">
+              경로
+            </div>
+            <div class="search-line">
+              <button class="button is-small is-fullwidth" id="pathSelectBtn" onclick="openTargetModalBox('pathModal')">경로 선택</button>
+              <input type="hidden" id="pathSelectVal" />
+            </div>
+          </div>
+          <button type="submit" class="button is-primary is-fullwidth" onclick="searchNP()">검색</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="half-content">
+          <div id="npMap">
+          </div>
+        </div>
+        <div class="half-content">
+          <table class="table is-bordered is-narrow is-fullwidth change-list is-size-7">
+            <thead>
+              <tr>
+                <th rowspan="2">이름</th>
+                <th>촬영공간1</th>
+                <th rowspan="2">경로</th>
+                <th rowspan="2">삭제</th>
+              </tr>
+              <tr>
+                <th>촬영공간2</th>
+              </tr>
+            </thead>
+            <tbody id="dataTable">
+              <% for (var i = 0; i < data.npList.length; i++) {%>
+              <tr name="row<%= data.npList[i].n_NEIGHBOR_ID %>" class="hover-pointer" onclick="drawNPOnMap(<%= data.npList[i].n_NEIGHBOR_ID %>, <%= data.npList[i].tp1_lat %>, <%= data.npList[i].tp1_lng %>, <%= data.npList[i].tp2_lat %>, <%= data.npList[i].tp2_lng %>, <%= data.npList[i].ps_lat %>, <%= data.npList[i].ps_lng %>, <%= data.npList[i].pe_lat %>, <%= data.npList[i].pe_lng %>)">
+                <td rowspan="2"><%= data.npList[i].v_NEIGHBOR_NAME %></td>
+                <td><%= data.npList[i].tp1_address %> <%= data.npList[i].tp1_building %> <%= data.npList[i].tp1_floor %> <%= data.npList[i].tp1_site %></td>
+                <td rowspan="2"><%= data.npList[i].path_name %></td>
+                <td rowspan="2"><button class="button is-small" onclick="deleteNP(<%= data.npList[i].n_NEIGHBOR_ID %>)">삭제</button></td>
+              </tr>
+              <tr name="row<%= data.npList[i].n_NEIGHBOR_ID %>" class="hover-pointer" onclick="drawNPOnMap(<%= data.npList[i].n_NEIGHBOR_ID %>, <%= data.npList[i].tp1_lat %>, <%= data.npList[i].tp1_lng %>, <%= data.npList[i].tp2_lat %>, <%= data.npList[i].tp2_lng %>, <%= data.npList[i].ps_lat %>, <%= data.npList[i].ps_lng %>, <%= data.npList[i].pe_lat %>, <%= data.npList[i].pe_lng %>)">
+                <td><%= data.npList[i].tp2_address %> <%= data.npList[i].tp2_building %> <%= data.npList[i].tp2_floor %> <%= data.npList[i].tp2_site %></td>
+              </tr>
+              <%}%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal" id="modalBox">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">이웃공간 추가</p>
+        <button class="delete" aria-label="close" onclick="hideModalBox()"></button>
+      </header>
+      <section class="modal-card-body">
+        <div class="content">
+          <div class="search-box">
+            <div class="search-field">
+              <div class="search-label">
+                이름
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control">
+                    <input class="input is-small" type="text" placeholder="이웃공간 이름" name="nameSelect">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                지도위치
+              </div>
+              <div class="search-line">
+                <div class="field">
+                  <div class="control" id="npAddMap" style="min-height: 300px;">
+                  </div>
+
+                  <input type="hidden" name="npSelectTP1"/>
+                  <input type="hidden" name="npSelectTP2"/>
+                  <input type="hidden" name="npSelectPath"/>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                촬영공간1
+              </div>
+              <div class="search-line">
+                <div class="select is-small is-fullwidth">
+                  <select name="tpSelect1" onchange="setNPSelectInput('TP1', this)">
+                    <option value="-1">촬영공간1를 선택해주세요.</option>
+                    <% for (var i = 0; i < data.tpList.length; i++) {%>
+                      <option value="<%= data.tpList[i].n_TAKE_SPACE_ID%>" name="<%= JSON.stringify({latitude: data.tpList[i].f_LAT, longitude: data.tpList[i].f_LNG}) %>"><%= data.tpList[i].v_ADDRESS %> <%= data.tpList[i].v_BUILDING %> <%= data.tpList[i].v_FLOOR %> <%= data.tpList[i].v_SITE %></option>
+                    <%}%>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                촬영공간2
+              </div>
+              <div class="search-line">
+                <div class="select is-small is-fullwidth">
+                  <select name="tpSelect2" onchange="setNPSelectInput('TP2', this)">
+                    <option value="-1">촬영공간2를 선택해주세요.</option>
+                    <% for (var i = 0; i < data.tpList.length; i++) {%>
+                      <option value="<%= data.tpList[i].n_TAKE_SPACE_ID%>" name="<%= JSON.stringify({latitude: data.tpList[i].f_LAT, longitude: data.tpList[i].f_LNG}) %>"><%= data.tpList[i].v_ADDRESS %> <%= data.tpList[i].v_BUILDING %> <%= data.tpList[i].v_FLOOR %> <%= data.tpList[i].v_SITE %></option>
+                    <%}%>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="search-field">
+              <div class="search-label">
+                경로
+              </div>
+              <div class="search-line">
+                <div class="select is-small is-fullwidth">
+                  <select name="pathSelect" onchange="setNPSelectInput('Path', this)">
+                    <option value="-1">경로를 선택해주세요.</option>
+                    <% for (var i = 0; i < data.pathList.length; i++) {%>
+                      <option value="<%= data.pathList[i].n_PATH_ID%>"  name="<%= JSON.stringify([{latitude: data.pathList[i].f_LAT_START, longitude: data.pathList[i].f_LNG_START}, {latitude: data.pathList[i].f_LAT_END, longitude: data.pathList[i].f_LNG_END}]) %>"><%= data.pathList[i].v_PATH_NAME %> [<%= data.pathList[i].v_LOCATION %>]</option>
+                    <%}%>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="appendNP()">추가</button>
+      </footer>
+    </div>
+  </div>
+
+
+  <div class="modal" id="tp1Modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">검색 : 촬영공간1 선택</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('tp1Modal')"></button>
+      </header>
+      <section class="modal-card-body">
+        <% for (var i = 0; i < data.tpList.length; i++) { %>
+        <button class="button is-small select-button" onclick="selectBtn(this)" id="tp1Btn<%= data.tpList[i].n_TAKE_SPACE_ID %>"><%= data.tpList[i].v_ADDRESS %> <%= data.tpList[i].v_BUILDING %> <%= data.tpList[i].v_FLOOR %> <%= data.tpList[i].v_SITE %></button>
+        <% } %>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="saveOptions('tp1')">완료</button>
+      </footer>
+    </div>
+  </div>
+
+
+  <div class="modal" id="tp2Modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">검색 : 촬영공간2 선택</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('tp2Modal')"></button>
+      </header>
+      <section class="modal-card-body">
+        <% for (var i = 0; i < data.tpList.length; i++) { %>
+        <button class="button is-small select-button" onclick="selectBtn(this)" id="tp2Btn<%= data.tpList[i].n_TAKE_SPACE_ID %>"><%= data.tpList[i].v_ADDRESS %> <%= data.tpList[i].v_BUILDING %> <%= data.tpList[i].v_FLOOR %> <%= data.tpList[i].v_SITE %></button>
+        <% } %>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="saveOptions('tp2')">완료</button>
+      </footer>
+    </div>
+  </div>
+
+
+  <div class="modal" id="pathModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">검색 : 경로 선택</p>
+        <button class="delete" aria-label="close" onclick="hideTargetModalBox('pathModal')"></button>
+      </header>
+      <section class="modal-card-body">
+        <% for (var i = 0; i < data.pathList.length; i++) {%>
+        <button class="button is-small select-button" onclick="selectBtn(this)" id="pathBtn<%= data.pathList[i].n_PATH_ID %>"><%= data.pathList[i].v_PATH_NAME %> [<%= data.pathList[i].v_LOCATION %>]</button>
+        <% } %>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary is-fullwidth" onclick="saveOptions('path')">완료</button>
+      </footer>
+    </div>
+  </div>
+
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/javascripts/main.bundle.js"></script>
+<script src="/javascripts/myScripts.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmBwHX4GyyS7PxSu4jBwTLM2uelcCVdb8&callback=initNPMap"
+    async defer></script>
+</html>

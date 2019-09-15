@@ -1,0 +1,254 @@
+body, html {
+  width: 100%;
+  height: 100%;
+
+  overflow: auto;
+}
+
+
+.content-wrapper {
+  width: 100%;
+  height: calc(100% - 52px);
+
+  overflow: hidden;
+}
+
+.half-content {
+  width: 50%;
+  float: left;
+
+  min-height: 100%;
+  overflow: hidden;
+}
+
+#tpMap, #pathMap, #npMap, #seqMap {
+  width: calc(100% - 10px);
+  margin-right: 10px;
+  height: 100%;
+  min-height: 500px;
+}
+
+.sidebar {
+  width: 250px;
+  min-height: 100%;
+  height: 100%;
+
+  overflow: auto;
+
+  border-right: 1px solid lightgray;
+
+  padding: 20px;
+
+  float: left;
+}
+
+.main-content {
+  width: calc(100% - 500px);
+  height: 100%;
+
+  overflow: auto;
+
+  padding: 20px;
+  background: rgb(248, 248, 248);
+
+  float: left;
+}
+
+
+.content-full {
+  width: calc(100% - 250px);
+}
+
+.sub-sidebar {
+  width: 250px;
+  height: 100%;
+
+  overflow: auto;
+  padding: 20px;
+
+  border-left: 1px solid lightgray;
+  float: left;
+}
+
+.tile-box {
+  width: 100%;
+  padding: 10px;
+}
+
+#searchBox.content {
+  width: 100%;
+  height: 0px;
+  margin: 0px;
+  overflow: hidden;
+}
+
+#searchBox.content.opened {
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+/* CCTV styles */
+.cctv-monitor {
+  width: 100%;
+
+  margin-bottom: 40px;
+  border: 1px solid lightgray;
+}
+
+.change-wrapper-side .table {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+.change-wrapper-side {
+  width: calc(50% - 10px);
+  height: 100%;
+
+  margin: 0px 5px;
+
+  float: left;
+  display: block;
+}
+
+.change-wrapper-mid {
+  width: 80px;
+  height: 100%;
+
+  float: left;
+}
+
+
+/* search-box */
+.search-box {
+  width: 100%;
+  height: 100%;
+
+  border: 1px solid lightgray;
+  padding: 10px;
+
+  background: white;
+}
+
+.search-box.full-width {
+  padding: 0px;
+  border: 0px;
+}
+
+
+.search-field {
+  width: 100%;
+
+  padding: 5px 0px;
+  display: block;
+  overflow: hidden;
+}
+
+.search-line {
+  width: calc(100% - 81px);
+  padding: 0px 30px;
+  overflow: hidden;
+  display: flex;
+  float: left;
+}
+
+.search-label {
+  width: 80px;
+  text-align: center;
+
+  float: left;
+  border-right: 1px solid lightgray;
+}
+
+.search-line .field {
+  width: 100%;
+  margin: 0px;
+}
+
+.search-box input[type="submit"] {
+  margin-top: 10px;
+}
+
+.search-box > button {
+  margin-top: 10px;
+}
+
+.search-btn {
+  width: 100%;
+
+  border: 1px solid lightgray;
+  border-radius: 0px;
+
+  margin: 0px;
+  margin-bottom: 10px;
+}
+
+.search-btn:focus {
+  outline: none;
+}
+
+
+
+.table *, * th {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+
+.color-white {
+  background: white;
+}
+
+
+.is-optional-button {
+  float: right;
+  margin-left: 5px;
+}
+
+.select-button {
+  margin-bottom: 5px;
+}
+
+.modal-upwall {
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.8);
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  position: absolute;
+
+  color: white;
+
+  z-index: 1000;
+}
+
+.modal-upwall.opened {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hover-pointer {
+  cursor: pointer;
+  background: white !important;
+}
+
+.hover-pointer:hover {
+  background: white !important;
+}
+
+.hover-pointer.tr-selected {
+  background: lightblue !important;
+}
+
+.hover-pointer.tr-selected:hover {
+  background: lightblue !important;
+}
+
+tr:hover {
+  background: white !important;
+}

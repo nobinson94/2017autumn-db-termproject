@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <style>
+       #map {
+        height: 400px;
+        width: 100%;
+       }
+    </style>
+  <title>CCTV MANAGER</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+  <link rel='stylesheet' href='/stylesheets/total.style.css' />
+</head>
+<body>
+  <nav class="navbar is-link">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+          CCTV MANAGER
+      </a>
+      <div class="navbar-burger burger" data-target="navMenuColorlink-example">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="field is-grouped">
+            <p class="control">
+              <span>'<%= session.USER_NAME %>'님</span>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/info/show/">
+                <span class="icon">
+                  <i class="fa fa-pencil"></i>
+                </span>
+                <span>
+                  내 정보
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small" href="/api/auth/signout/">
+                <span class="icon">
+                  <i class="fa fa-sign-out"></i>
+                </span>
+                <span>로그아웃</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <div class="sidebar">
+      <aside class="menu">
+        <p class="menu-label">
+          CCTV 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/cctv/monitor/" <% if (pageType == 0) { %>class="is-active"<% }%>>CCTV 모니터링</a></li>
+          <li><a href="/cctv/edit/" <% if (pageType == 1) { %>class="is-active"<% }%>>CCTV 공간관리</a></li>
+          <% if (session.USER_POSITION == 0) { %>
+            <li><a href="/cctv/add/" <% if (pageType == 2) { %>class="is-active"<% }%>>CCTV 관리</a></li>
+          <% } %>
+        </ul>
+        <p class="menu-label">
+          파일 관리
+        </p>
+        <ul class="menu-list">
+          <li><a href="/file/movie/" <% if (pageType == 3) { %>class="is-active"<% }%>>영상파일 관리</a></li>
+          <li><a href="/file/log/" <% if (pageType == 4) { %>class="is-active"<% }%>>로그파일 관리</a></li>
+        </ul>
+        <% if (session.USER_POSITION == 0) { %>
+          <p class="menu-label">
+            유저 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/user/manage/" <% if (pageType == 5) { %>class="is-active"<% }%>>일반관리자 관리</a></li>
+          </ul>
+          <p class="menu-label">
+            공간 관리
+          </p>
+          <ul class="menu-list">
+            <li><a href="/takeSpace/manage/" <% if (pageType == 9) { %>class="is-active"<% }%>>촬영공간 관리</a></li>
+            <li><a href="/path/manage/" <% if (pageType == 10) { %>class="is-active"<% }%>>경로 관리</a></li>
+            <li><a href="/neighbor/manage/" <% if (pageType == 6) { %>class="is-active"<% }%>>이웃공간 관리</a></li>
+            <li><a href="/sequence/manage/" <% if (pageType == 7) { %>class="is-active"<% }%>>시퀀스 관리</a></li>
+          </ul>
+        <% } %>
+      </aside>
+    </div>
+
+
+    <div class="main-content">
+      <% if (data.cctvList.length > 0) { %>
+      <div class="content">
+        <h3>◎ CCTV 모니터링 | <span style="font-size: 14px;"><i class="fa fa-video-camera"></i>  CCTV[<%= data.targetCctv[0].v_MODEL %>][<%= data.targetCctv[0].n_CCTV_ID %>]</span></h3>
+      </div>
+      <div class="content">
+        <video class="cctv-monitor" autoplay>
+          <source src="/videos/cctv_dummy_video.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="content">
+        <h3>◎ CCTV 지도 | <span style="font-size: 14px;"><i class="fa fa-video-camera"></i>  CCTV[<%= data.targetCctv[0].v_MODEL %>][<%= data.targetCctv[0].n_CCTV_ID %>]</span></h3>
+        <div id = "map"></div>
+      </div>
+      <br>
+      <br>
+      <div>
+        <input type="hidden" id="targetCctvInput" value="<%= JSON.stringify(data.targetCctv) %>" />
+      </div>
+      <div class="content">
+        <h3>◎ CCTV 촬영공간 | <span style="font-size: 14px;"><i class="fa fa-video-camera"></i>  CCTV[<%= data.targetCctv[0].v_MODEL %>][<%= data.targetCctv[0].n_CCTV_ID %>]</span></h3>
+        <table class="table is-bordered is-striped is-narrow is-fullwidth">
+          <thead>
+            <tr>
+              <th>주소</th>
+              <th>건물</th>
+              <th>층</th>
+              <th>위치</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let tpElement of data.tpList) {%>
+            <tr class="tp-list-tr" data-lat="<%= tpElement.f_LAT %>" data-lng="<%= tpElement.f_LNG %>" >
+              <td><%= tpElement.v_ADDRESS %></td>
+              <td><%= tpElement.v_BUILDING %></td>
+              <td><%= tpElement.v_FLOOR %></td>
+              <td><%= tpElement.v_SITE %></td>
+            </tr>
+            <%}%>
+          </tbody>
+        </table>
+      </div>
+      <% } else { %>
+      <div class="content">
+        <h3>◎ CCTV 모니터링</h3>
+      </div>
+      <% }%>
+    </div>
+
+    <div class="sub-sidebar">
+      <nav class="panel">
+        <p class="panel-heading">
+          CCTV 리스트
+        </p>
+
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <input class="input is-small" type="text" placeholder="search" name="cctvSearchInput" onkeyup="makeCCTVList()">
+            <span class="icon is-small is-left">
+              <i class="fa fa-search"></i>
+            </span>
+          </p>
+        </div>
+        <% for (var i = 0; i < data.cctvList.length; i++) {%>
+        <a href="/cctv/monitor/<%= data.cctvList[i].n_CCTV_ID %>" class="panel-block <% if (data.cctvList[i].n_CCTV_ID == data.targetCctv[0].n_CCTV_ID) {%>is-active<%}%>" style="font-size: 12px;">
+          <span class="panel-icon">
+            <i class="fa fa-video-camera"></i>
+          </span>
+          CCTV[<%= data.cctvList[i].v_MODEL %>][<%= data.cctvList[i].n_CCTV_ID %>]
+        </a>
+        <%}%>
+        <% if (data.cctvList.length == 0) {%>
+        <div class="panel-block">
+          할당된 CCTV가 없습니다.
+        </div>
+        <%}%>
+      </nav>
+    </div>
+  </div>
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/javascripts/myScripts.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmBwHX4GyyS7PxSu4jBwTLM2uelcCVdb8&callback=initMap"
+    async defer></script>
+<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+</html>
